@@ -9,9 +9,12 @@ export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [checkEmail, setCheckEmail] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -29,7 +32,6 @@ export default function SignupPage() {
     setError(null)
     setLoading(true)
 
-    // Client-side validation
     if (!email || !password || !confirmPassword) {
       setError('All fields are required')
       setLoading(false)
@@ -78,14 +80,14 @@ export default function SignupPage() {
           return
         }
         
-        // If no email confirmation required, redirect immediately
+        // If no email confirmation required (session exists), redirect immediately
         if (data.session) {
           setTimeout(() => {
             router.push('/dashboard')
             router.refresh()
           }, 1500)
         } else {
-          // Email confirmation is required
+          setCheckEmail(true) 
           setError(null)
         }
       }
@@ -139,36 +141,84 @@ export default function SignupPage() {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your password (min 6 characters)"
-                disabled={loading || success}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none relative block w-full px-3 py-2 pr-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Enter your password (min 6 characters)"
+                  disabled={loading || success}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  disabled={loading || success}
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3l18 18" />
+                      <path d="M10.58 10.58a2 2 0 012.83 2.83" />
+                      <path d="M9.88 4.24A10.94 10.94 0 0112 4c4.477 0 8.268 2.943 9.542 7a10.98 10.98 0 01-4.06 5.34" />
+                      <path d="M6.11 6.11A10.98 10.98 0 002.458 12c1.274 4.057 5.065 7 9.542 7 1.55 0 3.01-.35 4.28-.98" />
+                      <path d="M14.12 14.12A3 3 0 019.88 9.88" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div>
               <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
                 Confirm Password
               </label>
-              <input
-                id="confirm-password"
-                name="confirm-password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Confirm your password"
-                disabled={loading || success}
-              />
+              <div className="relative">
+                <input
+                  id="confirm-password"
+                  name="confirm-password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="appearance-none relative block w-full px-3 py-2 pr-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Confirm your password"
+                  disabled={loading || success}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  disabled={loading || success}
+                >
+                  {showConfirmPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3l18 18" />
+                      <path d="M10.58 10.58a2 2 0 012.83 2.83" />
+                      <path d="M9.88 4.24A10.94 10.94 0 0112 4c4.477 0 8.268 2.943 9.542 7a10.98 10.98 0 01-4.06 5.34" />
+                      <path d="M6.11 6.11A10.98 10.98 0 002.458 12c1.274 4.057 5.065 7 9.542 7 1.55 0 3.01-.35 4.28-.98" />
+                      <path d="M14.12 14.12A3 3 0 019.88 9.88" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -198,11 +248,11 @@ export default function SignupPage() {
           )}
 
           {success && !error && (
-            <div className="rounded-md bg-green-50 p-4">
+            <div className={`rounded-md p-4 ${checkEmail ? 'bg-yellow-50' : 'bg-green-50'}`}>
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg
-                    className="h-5 w-5 text-green-400"
+                    className={`h-5 w-5 ${checkEmail ? 'text-yellow-400' : 'text-green-400'}`}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -216,8 +266,10 @@ export default function SignupPage() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-green-800">
-                    Account created successfully! Redirecting to dashboard...
+                  <p className={`text-sm font-medium ${checkEmail ? 'text-yellow-800' : 'text-green-800'}`}>
+                    {checkEmail 
+                      ? 'Account created! Please check your email to confirm your account.' 
+                      : 'Account created successfully! Redirecting to dashboard...'}
                   </p>
                 </div>
               </div>
